@@ -8,177 +8,238 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;image-rendering:pixelated;user-select:none;-webkit-tap-highlight-color:transparent}
 body{background:#000;overflow:hidden;width:100vw;height:100vh;font-family:'Press Start 2P',monospace}
-
-/* ===== CANVAS LAYERS ===== */
 #world{position:relative;width:100vw;height:100vh;overflow:hidden}
 
-/* ===== SKY ===== */
-#sky{position:absolute;inset:0;background:linear-gradient(180deg,#1a1a6e 0%,#2a2a9e 30%,#6a6aae 60%,#c87020 75%,#e04010 85%,#ff6030 100%);z-index:0}
+/* ===== SKY - day/sakura ===== */
+#sky{position:absolute;inset:0;background:linear-gradient(180deg,#87CEEB 0%,#b0e0ff 35%,#ffd6e8 60%,#ffb3c8 80%,#ff8fa8 100%);z-index:0}
 
-/* Pixel stars */
-.star{position:absolute;background:#ffffcc;animation:twinkle var(--d) infinite alternate;animation-delay:var(--dl)}
-@keyframes twinkle{0%{opacity:.2}100%{opacity:1}}
+/* ===== STARS ===== */
+.star{position:absolute;background:#ffffcc;animation:twinkle var(--d) infinite alternate;animation-delay:var(--dl);z-index:1}
+@keyframes twinkle{0%{opacity:.1}100%{opacity:.9}}
 
-/* ===== PIXEL SUN / MOON ===== */
-#sun{position:absolute;top:60px;right:120px;width:48px;height:48px;background:#FFFF00;box-shadow:0 0 0 8px #FFD700,0 0 0 16px rgba(255,200,0,.3);z-index:1;animation:sunPulse 3s infinite alternate}
-@keyframes sunPulse{0%{box-shadow:0 0 0 8px #FFD700,0 0 0 16px rgba(255,200,0,.3)}100%{box-shadow:0 0 0 12px #FFD700,0 0 0 24px rgba(255,200,0,.5)}}
+/* ===== SHOOTING STAR ===== */
+.shoot{position:absolute;width:60px;height:3px;background:linear-gradient(90deg,#fff,transparent);animation:shoot var(--d) linear infinite;animation-delay:var(--dl);z-index:2;transform:rotate(-30deg)}
+@keyframes shoot{0%{left:-80px;top:var(--ty);opacity:1}80%{opacity:1}100%{left:110vw;top:calc(var(--ty) + 80px);opacity:0}}
 
-/* ===== CLOUDS (pixel blocks) ===== */
-.cloud{position:absolute;z-index:2;animation:cloudDrift var(--d) linear infinite;animation-delay:var(--dl)}
+/* ===== SUN ===== */
+#sun{position:absolute;top:50px;right:100px;width:56px;height:56px;background:#FFFF00;box-shadow:0 0 0 8px #FFD700,0 0 0 20px rgba(255,220,0,.25);z-index:3;animation:sunPulse 3s infinite alternate}
+@keyframes sunPulse{0%{box-shadow:0 0 0 8px #FFD700,0 0 0 20px rgba(255,220,0,.2)}100%{box-shadow:0 0 0 14px #FFD700,0 0 0 32px rgba(255,220,0,.4)}}
+
+/* Sun rays */
+.sun-ray{position:absolute;width:8px;height:24px;background:#FFD700;top:50%;left:50%;transform-origin:4px -36px}
+
+/* ===== MOON ===== */
+#moon{position:absolute;top:55px;left:80px;width:40px;height:40px;background:#ffffcc;border-radius:0;box-shadow:inset -8px -4px 0 #cccc88;z-index:3}
+
+/* ===== PIXEL CLOUDS ===== */
+.cloud{position:absolute;z-index:4;animation:cloudDrift var(--d) linear infinite;animation-delay:var(--dl)}
 .cloud-row{display:flex}
-.cpx{width:16px;height:16px;background:#fff}
-@keyframes cloudDrift{0%{transform:translateX(-200px)}100%{transform:translateX(calc(100vw + 200px))}}
+.cpx{width:16px;height:16px}
+.cpx-w{background:#fff}
+.cpx-shadow{background:#ddeeff}
+@keyframes cloudDrift{0%{transform:translateX(-300px)}100%{transform:translateX(calc(100vw + 300px))}}
 
-/* ===== NETHER PORTAL (background) ===== */
-.portal-bg{position:absolute;z-index:3;animation:portalGlow 1.5s infinite alternate}
-@keyframes portalGlow{0%{filter:brightness(.8)}100%{filter:brightness(1.3)}}
-.portal-frame-px{display:grid;gap:0}
-.ppx{width:16px;height:16px}
-.p-obsidian{background:#1a0a2e}
-.p-purple{background:#8800ff;animation:purpleFlicker .4s infinite alternate;animation-delay:var(--dl,0s)}
-@keyframes purpleFlicker{0%{background:#6600cc;opacity:.8}100%{background:#aa00ff;opacity:1}}
+/* ===== NETHER PORTALS ===== */
+.portal-wrap{position:absolute;z-index:5;animation:portalBob 4s infinite ease-in-out;animation-delay:var(--dl,0s)}
+@keyframes portalBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.p-ob{width:16px;height:16px;background:#1a0a2e;box-shadow:inset -2px -2px 0 #0d0514,inset 2px 2px 0 #2e1550}
+.p-pu{width:16px;height:16px;background:#8800ff;animation:pFlick .35s infinite alternate;animation-delay:var(--dl,0s)}
+@keyframes pFlick{0%{background:#5500cc;opacity:.8}100%{background:#bb00ff;opacity:1}}
+.p-air{width:16px;height:16px;background:transparent}
 
-/* ===== CASTLE ===== */
-#castleWrap{position:absolute;z-index:4;bottom:var(--ground-h);left:50%;transform:translateX(-50%)}
-.castle-px{display:grid;gap:0;line-height:0}
-.castle-row{display:flex}
-.c-air{width:16px;height:16px;background:transparent}
-.c-stone{width:16px;height:16px;background:#888;box-shadow:inset -2px -2px 0 #555,inset 2px 2px 0 #aaa}
-.c-cobble{width:16px;height:16px;background:#777;box-shadow:inset -2px -2px 0 #444,inset 2px 2px 0 #999}
-.c-dark{width:16px;height:16px;background:#333;box-shadow:inset -2px -2px 0 #111,inset 2px 2px 0 #555}
-.c-window{width:16px;height:16px;background:#FFFF00;animation:windowFlicker var(--d,1.5s) infinite alternate;animation-delay:var(--dl,0s);box-shadow:0 0 4px #ffcc00}
-@keyframes windowFlicker{0%{background:#FFAA00;opacity:.7}100%{background:#FFFF00;opacity:1}}
-.c-lava{width:16px;height:16px;background:#ff4500;animation:lavaAnim 0.8s infinite alternate;animation-delay:var(--dl,0s)}
-@keyframes lavaAnim{0%{background:#cc2200}100%{background:#ff6600}}
-.c-portal{width:16px;height:16px;background:#8800ff;animation:purpleFlicker .3s infinite alternate}
-.c-iron{width:16px;height:16px;background:#aaa;box-shadow:inset -2px -2px 0 #777,inset 2px 2px 0 #ddd}
-.c-door{width:16px;height:16px;background:#4a2800;box-shadow:inset -1px -1px 0 #2a1400,inset 1px 1px 0 #6a3800}
-.c-brick{width:16px;height:16px;background:#8b4513;box-shadow:inset -2px -2px 0 #5a2d0a,inset 2px 2px 0 #b05a1a}
-.c-netherrack{width:16px;height:16px;background:#4d1414;box-shadow:inset -2px -2px 0 #2d0808,inset 2px 2px 0 #6d2020}
-.c-glowstone{width:16px;height:16px;background:#ffcc44;animation:windowFlicker 1s infinite alternate;box-shadow:0 0 6px #ffaa00}
-.c-flag-r{width:16px;height:16px;background:#cc0000}
-.c-flag-p{width:16px;height:16px;background:#aa00ff}
-.c-pole{width:4px;height:16px;background:#888;margin:0 6px}
+/* ===== END CRYSTAL ===== */
+.end-crystal{position:absolute;z-index:6;animation:crystalSpin 3s linear infinite,crystalBob 2s ease-in-out infinite;animation-delay:var(--dl,0s)}
+@keyframes crystalSpin{0%{transform:rotateY(0deg)}100%{transform:rotateY(360deg)}}
+@keyframes crystalBob{0%,100%{margin-top:0}50%{margin-top:-12px}}
+.ec-row{display:flex}
+.ec-p{width:8px;height:8px;background:#ff00ff;animation:pFlick .2s infinite alternate;box-shadow:0 0 4px #ff00ff}
+.ec-e{width:8px;height:8px;background:transparent}
+.ec-b{width:8px;height:8px;background:#880088}
+.ec-beam{width:4px;background:linear-gradient(180deg,#ff00ff,transparent);animation:beamPulse 1s infinite alternate;margin:0 auto}
+@keyframes beamPulse{0%{opacity:.4}100%{opacity:1}}
 
-/* ===== PIXEL TREES ===== */
-.tree{position:absolute;z-index:5;bottom:var(--ground-h);display:flex;flex-direction:column;align-items:center}
-.tree-leaves-row{display:flex}
+/* ===== MOUNTAINS (pixel) ===== */
+.mountain{position:absolute;bottom:var(--ground-h);z-index:3}
+.mt-row{display:flex}
+.mt-s{width:16px;height:16px;background:#5a6a7a;box-shadow:inset -2px -2px 0 #3a4a5a,inset 2px 2px 0 #7a8a9a}
+.mt-snow{width:16px;height:16px;background:#eef;box-shadow:inset -2px -2px 0 #ccf,inset 2px 2px 0 #fff}
+.mt-dark{width:16px;height:16px;background:#3a4a5a;box-shadow:inset -2px -2px 0 #2a3a4a,inset 2px 2px 0 #4a5a6a}
+.mt-air{width:16px;height:16px;background:transparent}
+
+/* ===== ENDER DRAGON (pixel, flying) ===== */
+#dragon{position:absolute;z-index:8;animation:dragonFly 20s linear infinite}
+@keyframes dragonFly{0%{left:-200px;top:8%}50%{top:18%}100%{left:110vw;top:8%}}
+.dr-row{display:flex;align-items:center}
+.dr-b{width:8px;height:8px;background:#1a0030;box-shadow:inset -1px -1px 0 #0a0010,inset 1px 1px 0 #3a0060}
+.dr-e{width:8px;height:8px;background:transparent}
+.dr-p{width:8px;height:8px;background:#aa00ff}
+.dr-w{width:8px;height:8px;background:#330055;animation:wingFlap .3s infinite alternate}
+@keyframes wingFlap{0%{transform:scaleY(1)}100%{transform:scaleY(.5)}}
+.dr-fire{width:8px;height:8px;background:#ff4400;animation:pFlick .2s infinite alternate}
+
+/* ===== SAKURA TREES ===== */
+.sakura-tree{position:absolute;z-index:7;bottom:var(--ground-h);display:flex;flex-direction:column;align-items:center}
+.sk-row{display:flex}
+.sk-blossom{width:16px;height:16px;background:var(--bc,#ff9ab2);box-shadow:inset -2px -2px 0 #cc6688,inset 2px 2px 0 #ffccdd;animation:blossomSway var(--d,3s) infinite alternate;animation-delay:var(--dl,0s)}
+@keyframes blossomSway{0%{background:var(--bc,#ff9ab2)}100%{background:#ffb3c8}}
+.sk-dark{width:16px;height:16px;background:#cc4466;box-shadow:inset -2px -2px 0 #992244,inset 2px 2px 0 #ee6688}
+.sk-trunk{width:16px;height:16px;background:#6a3a20;box-shadow:inset -2px -2px 0 #4a2010,inset 2px 2px 0 #8a5030}
+.sk-trunk-w{width:8px;height:16px;background:#6a3a20;box-shadow:inset -1px -2px 0 #4a2010,inset 1px 2px 0 #8a5030}
+
+/* Falling petals */
+.petal{position:absolute;z-index:10;animation:petalFall var(--d) linear infinite;animation-delay:var(--dl);pointer-events:none}
+@keyframes petalFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+.petal-px{width:6px;height:6px;background:#ffaacc}
+.petal-px2{width:4px;height:4px;background:#ff88bb}
+
+/* ===== OAK TREES ===== */
+.oak-tree{position:absolute;z-index:5;bottom:var(--ground-h);display:flex;flex-direction:column;align-items:center}
 .t-leaf{width:16px;height:16px;background:var(--lc,#2d8a00);box-shadow:inset -2px -2px 0 #1a5200,inset 2px 2px 0 #40aa00}
-.t-dark-leaf{width:16px;height:16px;background:#1a5200}
 .t-trunk{width:16px;height:16px;background:#8B5E3C;box-shadow:inset -2px -2px 0 #5a3a1a,inset 2px 2px 0 #b07040}
 
-/* ===== GROUND LAYERS ===== */
-#groundWrap{position:absolute;bottom:0;left:0;right:0;z-index:6}
-.ground-strip{display:flex;position:relative}
+/* Jungle tree */
+.jungle-leaf{width:16px;height:16px;background:#1a6e00;box-shadow:inset -2px -2px 0 #0a4a00,inset 2px 2px 0 #2a9a00}
+
+/* Dark oak / nether tree */
+.dark-leaf{width:16px;height:16px;background:#4a0a0a;box-shadow:inset -2px -2px 0 #2a0505,inset 2px 2px 0 #6a1515}
+
+/* ===== BAMBOO ===== */
+.bamboo{position:absolute;z-index:5;bottom:var(--ground-h);display:flex;flex-direction:column;align-items:center}
+.bm-seg{width:8px;height:10px;background:#4aaa00;box-shadow:inset -1px -1px 0 #2a7a00,inset 1px 1px 0 #6acc00}
+.bm-node{width:10px;height:4px;background:#3a8800}
+.bm-leaf-l{width:16px;height:8px;background:#5acc00;clip-path:polygon(0 50%,100% 0,100% 100%)}
+.bm-leaf-r{width:16px;height:8px;background:#5acc00;clip-path:polygon(0 0,100% 50%,0 100%)}
+
+/* ===== PIXEL ANIMALS ===== */
+.animal{position:absolute;z-index:8;bottom:var(--ground-h);animation:animalWalk var(--d) linear infinite;animation-delay:var(--dl)}
+@keyframes animalWalk{0%{left:var(--start,-80px)}100%{left:calc(100vw + 80px)}}
+
+/* pixel sheep: white body, black legs, dark head */
+/* pixel cow: brown/white */
+/* pixel fox: orange */
+
+/* ===== GROUND ===== */
+#groundWrap{position:absolute;bottom:0;left:0;right:0;z-index:9}
+.ground-strip{display:flex}
 .g-grass{width:16px;height:16px;background:#5d9e3b;box-shadow:inset -2px -2px 0 #3a7a1a,inset 2px 2px 0 #7abe4a}
+.g-sakura-grass{width:16px;height:16px;background:#7a9e6a;box-shadow:inset -2px -2px 0 #5a7a4a,inset 2px 2px 0 #9abf8a}
 .g-dirt{width:16px;height:16px;background:#8B5E3C;box-shadow:inset -2px -2px 0 #5a3a1a,inset 2px 2px 0 #aa7a50}
 .g-stone{width:16px;height:16px;background:#888;box-shadow:inset -2px -2px 0 #555,inset 2px 2px 0 #aaa}
 .g-diamond{width:16px;height:16px;background:#3af;box-shadow:inset -2px -2px 0 #06c,inset 2px 2px 0 #6cf}
+.g-gold{width:16px;height:16px;background:#ffcc00;box-shadow:inset -2px -2px 0 #aa8800,inset 2px 2px 0 #ffee88}
+.g-redstone{width:16px;height:16px;background:#cc2200;box-shadow:inset -2px -2px 0 #881100,inset 2px 2px 0 #ee4422}
+.g-emerald{width:16px;height:16px;background:#00aa44;box-shadow:inset -2px -2px 0 #006622,inset 2px 2px 0 #00cc66}
+.g-bedrock{width:16px;height:16px;background:#222;box-shadow:inset -2px -2px 0 #111,inset 2px 2px 0 #444}
+.g-sakura-petal{width:16px;height:16px;background:#ffccdd;box-shadow:inset -2px -2px 0 #ee99bb,inset 2px 2px 0 #ffe0ee}
 
-/* ===== MOBS (pixel style) ===== */
-.mob{position:absolute;z-index:7;bottom:var(--ground-h);animation:mobWalk var(--d) linear infinite;animation-delay:var(--dl)}
-@keyframes mobWalk{0%{left:-80px}100%{left:calc(100vw + 80px)}}
+/* ===== CASTLE ===== */
+#castleWrap{position:absolute;z-index:6;bottom:var(--ground-h);left:50%;transform:translateX(-50%)}
+.castle-row{display:flex}
+.c-air{width:16px;height:16px;background:transparent}
+.c-stone{width:16px;height:16px;background:#888;box-shadow:inset -2px -2px 0 #555,inset 2px 2px 0 #aaa}
+.c-dark{width:16px;height:16px;background:#444;box-shadow:inset -2px -2px 0 #222,inset 2px 2px 0 #666}
+.c-purpur{width:16px;height:16px;background:#8a4a8a;box-shadow:inset -2px -2px 0 #5a1a5a,inset 2px 2px 0 #ba7aba}
+.c-window{width:16px;height:16px;background:#FFFF00;animation:winFlick var(--d,1.5s) infinite alternate;animation-delay:var(--dl,0s);box-shadow:0 0 5px #ffcc00}
+@keyframes winFlick{0%{background:#FFAA00;opacity:.7}100%{background:#FFFF00;opacity:1}}
+.c-lava{width:16px;height:16px;background:#ff4500;animation:lavaA .8s infinite alternate;animation-delay:var(--dl,0s)}
+@keyframes lavaA{0%{background:#cc2200}100%{background:#ff6600}}
+.c-portal{width:16px;height:16px;background:#8800ff;animation:pFlick .3s infinite alternate}
+.c-glowstone{width:16px;height:16px;background:#ffcc44;animation:winFlick 1s infinite alternate;box-shadow:0 0 8px #ffaa00}
+.c-brick{width:16px;height:16px;background:#8b4513;box-shadow:inset -2px -2px 0 #5a2d0a,inset 2px 2px 0 #b05a1a}
+.c-flag-r{width:16px;height:16px;background:#cc0000}
+.c-flag-p{width:16px;height:16px;background:#aa00ff}
+.c-flag-s{width:16px;height:16px;background:#ffaacc}
+.c-netherrack{width:16px;height:16px;background:#4d1414;box-shadow:inset -2px -2px 0 #2d0808,inset 2px 2px 0 #6d2020}
 
-/* Pixel mob faces made of divs */
+/* ===== MOBS (walking pixel art) ===== */
+.mob{position:absolute;z-index:10;bottom:var(--ground-h);animation:mobW var(--d) linear infinite;animation-delay:var(--dl)}
+@keyframes mobW{0%{left:-100px}100%{left:calc(100vw + 100px)}}
 .mob-body{display:flex;flex-direction:column;align-items:center}
 .mob-row{display:flex}
-.m-skin{width:8px;height:8px;background:#c8a06a}
-.m-hair{width:8px;height:8px;background:#5a3010}
-.m-eye{width:8px;height:8px;background:#fff}
-.m-pupil{width:4px;height:4px;background:#000;margin:2px auto}
-.m-shirt{width:8px;height:8px;background:#3366cc}
-.m-pants{width:8px;height:8px;background:#1144aa}
-.m-green{width:8px;height:8px;background:#4a7a1a}
-.m-dark{width:8px;height:8px;background:#1a2200}
-.m-zombie-skin{width:8px;height:8px;background:#6a8a4a}
-.m-zombie-eye{width:8px;height:8px;background:#cc0000}
+.px{width:8px;height:8px}
 
-/* ===== PIXEL HEARTS / FLOATING ELEMENTS ===== */
-.float-item{position:absolute;z-index:8;animation:floatUp var(--d) ease-out infinite;animation-delay:var(--dl)}
-@keyframes floatUp{0%{transform:translateY(0);opacity:.9}100%{transform:translateY(-80px);opacity:0}}
+/* ===== FLOATING HEARTS/DIAMONDS ===== */
+.float-item{position:absolute;z-index:11;animation:floatUp var(--d) ease-out infinite;animation-delay:var(--dl);pointer-events:none}
+@keyframes floatUp{0%{transform:translateY(0) rotate(0deg);opacity:.9}100%{transform:translateY(-90px) rotate(20deg);opacity:0}}
 
-/* pixel heart */
-.px-heart{display:grid;grid-template-columns:repeat(7,4px);grid-template-rows:repeat(5,4px)}
-.h-r{background:#cc0000;width:4px;height:4px}
-.h-x{background:transparent;width:4px;height:4px}
+/* ===== FIREFLIES ===== */
+.firefly{position:absolute;z-index:9;width:4px;height:4px;background:#aaff44;border-radius:50%;animation:ffFly var(--d) ease-in-out infinite alternate,ffGlow var(--d2) ease-in-out infinite alternate;animation-delay:var(--dl)}
+@keyframes ffFly{0%{left:var(--x1);top:var(--y1)}100%{left:var(--x2);top:var(--y2)}}
+@keyframes ffGlow{0%{opacity:0;box-shadow:none}50%{opacity:1;box-shadow:0 0 6px #aaff44}100%{opacity:0}}
 
-/* pixel diamond */
-.px-diamond{display:grid;grid-template-columns:repeat(5,4px);grid-template-rows:repeat(5,4px)}
-.d-b{background:#56d9e8;width:4px;height:4px}
-.d-x{background:transparent;width:4px;height:4px}
+/* ===== LANTERNS floating ===== */
+.lantern{position:absolute;z-index:9;animation:lanternFloat var(--d) ease-in-out infinite;animation-delay:var(--dl)}
+@keyframes lanternFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-18px) rotate(3deg)}}
+.ln-row{display:flex}
+.ln-y{width:8px;height:8px;background:#ffcc00;box-shadow:0 0 6px #ff9900;animation:winFlick .8s infinite alternate}
+.ln-r{width:8px;height:8px;background:#cc4400}
+.ln-e{width:8px;height:8px;background:transparent}
 
-/* ===== PIXEL RYOKO TEXT ===== */
-.ryoko-sign{position:absolute;z-index:9;padding:8px 12px;background:#222;border:3px solid #888;box-shadow:inset -3px -3px 0 #000,inset 3px 3px 0 #aaa}
-.ryoko-sign p{font-family:'Press Start 2P',monospace;font-size:clamp(10px,2.5vw,16px);color:#ffff00;text-shadow:2px 2px 0 #aa8800;animation:signGlow 2s infinite alternate;line-height:2}
-@keyframes signGlow{0%{color:#ffcc00;text-shadow:2px 2px 0 #886600}100%{color:#ffff44;text-shadow:2px 2px 0 #aaaa00,0 0 12px #ffff00}}
+/* ===== RYOKO SIGNS ===== */
+.ryoko-sign{position:absolute;z-index:12;padding:6px 10px;background:#222;border:3px solid #888;box-shadow:inset -3px -3px 0 #000,inset 3px 3px 0 #aaa}
+.ryoko-sign p{font-family:'Press Start 2P',monospace;font-size:clamp(8px,2vw,14px);color:#ffff00;text-shadow:2px 2px 0 #aa8800;animation:signGlow 2s infinite alternate;line-height:1.8}
+.sakura-sign p{color:#ffaacc!important;text-shadow:2px 2px 0 #aa5577!important}
+@keyframes signGlow{0%{opacity:.8;text-shadow:2px 2px 0 #886600}100%{opacity:1;text-shadow:2px 2px 0 #aaaa00,0 0 14px #ffff00}}
 
-/* ===== UI OVERLAY ===== */
-#ui{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;pointer-events:none;padding:10px}
-
-/* Pixel hotbar (item bar) */
-#hotbar{display:flex;gap:4px;pointer-events:auto;margin-bottom:8px}
-.hotbar-slot{width:64px;height:64px;background:#8b8b8b;border:3px solid #555;box-shadow:inset -3px -3px 0 #373737,inset 3px 3px 0 #cfcfcf;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .1s;position:relative}
-.hotbar-slot:hover{transform:translateY(-4px);border-color:#ffff00;box-shadow:inset -3px -3px 0 #373737,inset 3px 3px 0 #cfcfcf,0 0 8px #ffff00}
+/* ===== UI ===== */
+#ui{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;pointer-events:none;padding:8px}
+#hotbar{display:flex;gap:4px;pointer-events:auto;margin-bottom:6px}
+.hotbar-slot{width:60px;height:60px;background:#8b8b8b;border:3px solid #555;box-shadow:inset -3px -3px 0 #373737,inset 3px 3px 0 #cfcfcf;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .1s;position:relative}
+.hotbar-slot:hover{transform:translateY(-4px);border-color:#ffff00;box-shadow:inset -3px -3px 0 #373737,inset 3px 3px 0 #cfcfcf,0 0 10px #ffff00}
 .hotbar-slot:active{transform:scale(.92)}
-.hotbar-slot.used{opacity:.5;pointer-events:none;border-color:#333}
-.slot-emoji{font-size:clamp(22px,5vw,32px)}
-.slot-label{font-family:'Press Start 2P',monospace;font-size:6px;color:#ffff00;text-align:center;margin-top:2px;line-height:1.2}
-.slot-count{position:absolute;bottom:3px;right:5px;font-family:'Press Start 2P',monospace;font-size:7px;color:#fff;text-shadow:1px 1px 0 #000}
-
-/* Health / XP bar */
-#statusBar{display:flex;flex-direction:column;align-items:center;gap:4px;margin-bottom:6px;pointer-events:none}
-.hud-row{display:flex;gap:3px;align-items:center}
-.hud-label{font-family:'Press Start 2P',monospace;font-size:8px;color:#fff;text-shadow:1px 1px 0 #000;margin-right:6px}
-.heart-icon{font-size:14px}
-.xp-bar-wrap{width:160px;height:8px;background:#333;border:2px solid #555}
+.hotbar-slot.used{opacity:.4;pointer-events:none;border-color:#333}
+.slot-emoji{font-size:clamp(20px,4.5vw,30px)}
+.slot-label{font-family:'Press Start 2P',monospace;font-size:5px;color:#ffff00;text-align:center;margin-top:2px}
+.slot-count{position:absolute;bottom:2px;right:4px;font-family:'Press Start 2P',monospace;font-size:7px;color:#fff;text-shadow:1px 1px 0 #000}
+#statusBar{display:flex;flex-direction:column;align-items:center;gap:3px;margin-bottom:4px;pointer-events:none}
+.hud-row{display:flex;gap:2px;align-items:center}
+.hud-label{font-family:'Press Start 2P',monospace;font-size:7px;color:#fff;text-shadow:1px 1px 0 #000;margin-right:5px}
+.heart-icon{font-size:13px}
+.xp-bar-wrap{width:150px;height:8px;background:#333;border:2px solid #555}
 .xp-bar-fill{height:100%;background:#80ff00;transition:width .5s}
-
-/* Chat / message box */
-#chatBox{pointer-events:auto;background:rgba(0,0,0,.7);border:2px solid #555;max-width:680px;width:100%;margin-top:auto;padding:10px 14px;max-height:28vh;overflow-y:auto}
-.chat-line{font-family:'Press Start 2P',monospace;font-size:clamp(7px,2vw,10px);color:#fff;text-shadow:1px 1px 0 #000;margin-bottom:6px;line-height:1.7}
+#chatBox{pointer-events:auto;background:rgba(0,0,0,.75);border:2px solid #555;max-width:660px;width:100%;margin-top:auto;padding:10px 12px;max-height:26vh;overflow-y:auto}
+.chat-line{font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.8vw,9px);color:#fff;text-shadow:1px 1px 0 #000;margin-bottom:5px;line-height:1.7}
 .chat-line span{color:#ffff55}
-.chat-poem{font-family:'Press Start 2P',monospace;font-size:clamp(6px,1.8vw,9px);color:#ffcc88;line-height:1.9;white-space:pre-line;text-shadow:1px 1px 0 #000}
-
-/* Counter (like Minecraft advancement) */
-#counter{pointer-events:none;background:rgba(0,0,0,.7);border:2px solid #ffff00;padding:6px 14px;margin-bottom:6px}
-#counter p{font-family:'Press Start 2P',monospace;font-size:clamp(8px,2.5vw,11px);color:#ffff00;text-shadow:2px 2px 0 #886600;text-align:center}
-
-/* Advancement toast */
-#toast{position:absolute;top:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);border:2px solid #55ffff;padding:8px 16px;z-index:30;display:none}
-#toast p{font-family:'Press Start 2P',monospace;font-size:9px;color:#55ffff;text-shadow:1px 1px 0 #006666;text-align:center;line-height:1.7}
-
+.chat-poem{font-family:'Press Start 2P',monospace;font-size:clamp(5px,1.5vw,8px);color:#ffccee;line-height:2;white-space:pre-line;text-shadow:1px 1px 0 #000}
+#counter{pointer-events:none;background:rgba(0,0,0,.75);border:2px solid #ffff00;padding:5px 12px;margin-bottom:5px}
+#counter p{font-family:'Press Start 2P',monospace;font-size:clamp(7px,2vw,10px);color:#ffff00;text-shadow:2px 2px 0 #886600;text-align:center}
+#toast{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);border:2px solid #55ffff;padding:8px 14px;z-index:40;display:none;white-space:nowrap}
+#toast p{font-family:'Press Start 2P',monospace;font-size:8px;color:#55ffff;text-shadow:1px 1px 0 #006666;text-align:center;line-height:1.6}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:#222}
 ::-webkit-scrollbar-thumb{background:#555}
-
-@media(max-width:600px){
-  .hotbar-slot{width:50px;height:50px}
-  .slot-emoji{font-size:22px}
-}
+@media(max-width:580px){.hotbar-slot{width:46px;height:46px}.slot-emoji{font-size:18px}}
 </style>
 </head>
 <body>
 <div id="world">
   <div id="sky"></div>
   <div id="sun"></div>
-  <div id="starsWrap"></div>
-  <div id="cloudsWrap"></div>
-  <div id="portalsWrap"></div>
+  <div id="moon"></div>
+  <div id="starsW"></div>
+  <div id="shootW"></div>
+  <div id="cloudsW"></div>
+  <div id="mountainsW"></div>
+  <div id="dragon"></div>
+  <div id="portalsW"></div>
+  <div id="crystalsW"></div>
+  <div id="lanternsW"></div>
+  <div id="firefliesW"></div>
+  <div id="treesW"></div>
+  <div id="bambooW"></div>
   <div id="castleWrap"></div>
-  <div id="treesWrap"></div>
   <div id="groundWrap"></div>
-  <div id="mobsWrap"></div>
-  <div id="floatWrap"></div>
-  <div id="signsWrap"></div>
+  <div id="mobsW"></div>
+  <div id="animalsW"></div>
+  <div id="floatW"></div>
+  <div id="petalsW"></div>
+  <div id="signsW"></div>
 
   <div id="ui">
     <div id="statusBar">
       <div class="hud-row">
         <span class="hud-label">HP</span>
-        <span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span>
-        <span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span>
-        <span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span>
-        <span class="heart-icon">❤️</span>
+        <span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span><span class="heart-icon">❤️</span>
       </div>
       <div class="hud-row">
         <span class="hud-label">XP</span>
@@ -188,325 +249,562 @@ body{background:#000;overflow:hidden;width:100vw;height:100vh;font-family:'Press
     <div id="counter"><p>⛏ 0 / 6 DIAMANTES 💎</p></div>
     <div id="hotbar"></div>
     <div id="chatBox">
-      <div class="chat-line"><span>[MUNDO]</span> Ryoko entro al servidor...</div>
-      <div class="chat-line"><span>[RYOKO]</span> Toca cada bloque para descubrir mensajes secretos 💜</div>
+      <div class="chat-line"><span>[MUNDO]</span> Ryoko entro al servidor sakura...</div>
+      <div class="chat-line"><span>[RYOKO]</span> 🌸 Toca cada bloque del hotbar para descubrir mensajes 💜</div>
     </div>
   </div>
-
-  <div id="toast"><p>🏆 LOGRO: TESORO DEL NETHER</p></div>
+  <div id="toast"><p>🏆 LOGRO DESBLOQUEADO!</p></div>
 </div>
 
 <script>
 (function(){
 const VW=window.innerWidth, VH=window.innerHeight;
 const COLS=Math.ceil(VW/16)+2;
-const GROUND_ROWS=5; // grass+4 dirt rows
-const GROUND_H=GROUND_ROWS*16; // px
+const GROUND_ROWS=6;
+const GROUND_H=GROUND_ROWS*16;
+document.documentElement.style.setProperty('--ground-h',GROUND_H+'px');
 
-// Set CSS var
-document.documentElement.style.setProperty('--ground-h', GROUND_H+'px');
+/* helpers */
+function px(cls,extraStyle){const d=document.createElement('div');d.className=cls;if(extraStyle)d.style.cssText=extraStyle;return d}
+function row(children){const d=document.createElement('div');d.style.display='flex';children.forEach(c=>d.appendChild(c));return d}
+function div(css){const d=document.createElement('div');d.style.cssText=css;return d}
 
 /* ===== STARS ===== */
-const starsW=document.getElementById('starsWrap');
-for(let i=0;i<80;i++){
-  const s=document.createElement('div');
-  s.className='star';
-  const sz=Math.random()<.3?4:2;
-  s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*55}%;--d:${1+Math.random()*3}s;--dl:${Math.random()*4}s;z-index:1`;
-  starsW.appendChild(s);
-}
+const starsW=document.getElementById('starsW');
+for(let i=0;i<60;i++){const s=px('star',`width:${Math.random()<.3?4:2}px;height:${Math.random()<.3?4:2}px;left:${Math.random()*100}%;top:${Math.random()*50}%;--d:${1+Math.random()*3}s;--dl:${Math.random()*4}s`);starsW.appendChild(s)}
+
+/* ===== SHOOTING STARS ===== */
+const shootW=document.getElementById('shootW');
+for(let i=0;i<3;i++){const s=px('shoot',`--d:${8+i*5}s;--dl:${-i*3}s;--ty:${5+i*8}vh`);shootW.appendChild(s)}
+
+/* ===== SUN RAYS ===== */
+const sunEl=document.getElementById('sun');
+for(let i=0;i<8;i++){const r=px('sun-ray');r.style.transform=`rotate(${i*45}deg)`;r.style.cssText+=`position:absolute;transform:rotate(${i*45}deg)`;sunEl.appendChild(r)}
 
 /* ===== CLOUDS ===== */
-const cloudsW=document.getElementById('cloudsWrap');
+const cloudsW=document.getElementById('cloudsW');
 const cloudShapes=[
-  [[0,1,1,0],[1,1,1,1],[1,1,1,1]],
-  [[0,1,1,1,0],[1,1,1,1,1],[1,1,1,1,1]],
-  [[0,0,1,0],[0,1,1,1],[1,1,1,1]],
+  [[0,1,1,0,0],[1,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0]],
+  [[0,0,1,1,0,0],[0,1,1,1,1,0],[1,1,1,1,1,1],[0,1,1,1,1,0]],
+  [[0,1,0,1,0],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0]],
+  [[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1]],
 ];
-for(let c=0;c<6;c++){
+for(let c=0;c<8;c++){
   const cloud=document.createElement('div');
   cloud.className='cloud';
   const shape=cloudShapes[c%cloudShapes.length];
-  const top=8+Math.random()*28;
-  const dur=30+Math.random()*40;
-  const del=-Math.random()*dur;
-  cloud.style.cssText=`top:${top}%;--d:${dur}s;--dl:${del}s`;
-  shape.forEach(row=>{
-    const rowEl=document.createElement('div');
-    rowEl.className='cloud-row';
-    row.forEach(cell=>{
-      const px=document.createElement('div');
-      px.className='cpx';
-      px.style.opacity=cell?'1':'0';
-      rowEl.appendChild(px);
+  // pink tint for sakura clouds
+  const isPink=c%3===0;
+  cloud.style.cssText=`top:${5+Math.random()*30}%;--d:${25+Math.random()*30}s;--dl:${-(Math.random()*40)}s`;
+  shape.forEach((r,ri)=>{
+    const rowEl=document.createElement('div');rowEl.className='cloud-row';
+    r.forEach(cell=>{
+      const cpx=document.createElement('div');
+      if(cell){cpx.className=ri===shape.length-1?'cpx cpx-shadow':'cpx cpx-w';if(isPink)cpx.style.background='#ffe0ee';}
+      else{cpx.style.cssText='width:16px;height:16px;background:transparent';}
+      rowEl.appendChild(cpx);
     });
     cloud.appendChild(rowEl);
   });
   cloudsW.appendChild(cloud);
 }
 
-/* ===== PORTALS ===== */
-const portalsW=document.getElementById('portalsWrap');
-// Portal = 4x5 obsidian frame with purple inside
-// Grid: O=obsidian, P=purple, _=air
-const portalGrid=[
-  ['_','O','O','_'],
-  ['O','P','P','O'],
-  ['O','P','P','O'],
-  ['O','P','P','O'],
-  ['_','O','O','_'],
-];
-function makePortal(leftPct, bottomPx, scale){
+/* ===== PIXEL MOUNTAINS ===== */
+const mountainsW=document.getElementById('mountainsW');
+// Build a tall mountain profile
+function makeMountain(leftPct, widthBlocks, heightBlocks, col, snowH, zIdx){
   const wrap=document.createElement('div');
-  wrap.className='portal-bg';
-  wrap.style.cssText=`left:${leftPct}%;bottom:${bottomPx}px;position:absolute`;
-  portalGrid.forEach((row,ri)=>{
-    const rowEl=document.createElement('div');
-    rowEl.style.display='flex';
-    row.forEach((cell,ci)=>{
-      const px=document.createElement('div');
+  wrap.style.cssText=`position:absolute;left:${leftPct}%;bottom:${GROUND_H}px;z-index:${zIdx||3}`;
+  for(let r=0;r<heightBlocks;r++){
+    const rowEl=document.createElement('div');rowEl.style.display='flex';
+    const blockW=Math.max(1,Math.round(widthBlocks*(r/heightBlocks)));
+    const indent=Math.floor((widthBlocks-blockW)/2);
+    for(let c=0;c<widthBlocks;c++){
+      const blk=document.createElement('div');
+      const isSnow=(r<snowH);
+      if(c>=indent&&c<indent+blockW){
+        blk.className=isSnow?'mt-snow':col;
+        // dark side
+        if(c===indent+blockW-1&&!isSnow)blk.className='mt-dark';
+      } else {blk.className='mt-air';}
+      rowEl.appendChild(blk);
+    }
+    wrap.insertBefore(rowEl,wrap.firstChild);
+  }
+  mountainsW.appendChild(wrap);
+}
+makeMountain(0,14,18,'mt-s',4,2);
+makeMountain(8,10,12,'mt-dark',3,2);
+makeMountain(70,16,20,'mt-s',5,2);
+makeMountain(80,9,11,'mt-dark',2,2);
+makeMountain(38,8,9,'mt-s',2,2);
+// Distant purple mountain (for depth)
+makeMountain(20,20,14,'mt-s',3,2);
+makeMountain(55,18,16,'mt-dark',4,2);
+
+/* ===== ENDER DRAGON ===== */
+const dragonEl=document.getElementById('dragon');
+// Simplified dragon: head + body + wings
+const drRows=[
+  [0,0,1,1,0,0, 0,1,1,1,0, 0,0,0,1,1,0],
+  [0,1,1,1,1,0, 1,1,1,1,1, 0,0,1,1,1,1],
+  [1,1,1,1,1,1, 1,1,1,1,1, 1,1,1,1,1,1],
+  [0,1,1,1,0,0, 0,1,1,1,0, 0,0,1,1,0,0],
+];
+const drColors=['dr-e','dr-b','dr-w','dr-p','dr-fire'];
+// just use emoji-based dragon for reliability + pixel body
+dragonEl.innerHTML=`
+<div style="display:flex;align-items:center;gap:0">
+  <div style="display:flex;flex-direction:column">
+    ${[
+      [0,0,1,0,0,0],[0,1,2,1,0,0],[1,2,3,2,1,0],[1,2,2,2,1,1],[0,1,1,1,1,0]
+    ].map(r=>`<div style="display:flex">${r.map(c=>`<div class="px" style="background:${['transparent','#1a0030','#330055','#aa00ff','#660088'][c]};box-shadow:${c?'inset -1px -1px 0 #0a0010':'none'}"></div>`).join('')}</div>`).join('')}
+  </div>
+  <div style="display:flex;flex-direction:column;margin-top:4px">
+    ${[[1,1,1,1],[1,1,1,1],[1,1,1,1],[1,1,1,1]].map(r=>`<div style="display:flex">${r.map(()=>`<div class="px" style="background:#1a0030;box-shadow:inset -1px -1px 0 #0a0010"></div>`).join('')}</div>`).join('')}
+  </div>
+  <div style="display:flex;flex-direction:column;margin-left:4px">
+    <div style="display:flex">
+      ${[0,1,1,0,0,0,0,0].map(c=>`<div class="px" style="background:${c?'#330055':'transparent'};animation:${c?'wingFlap .4s infinite alternate':'none'}"></div>`).join('')}
+    </div>
+    <div style="display:flex">
+      ${[1,1,1,1,0,0,0,0].map(c=>`<div class="px" style="background:${c?'#330055':'transparent'};animation:${c?'wingFlap .4s infinite alternate':'none'}"></div>`).join('')}
+    </div>
+    <div style="display:flex">
+      ${[0,1,1,1,1,0,0,0].map(c=>`<div class="px" style="background:${c?'#330055':'transparent'};animation:${c?'wingFlap .35s infinite alternate':'none'}"></div>`).join('')}
+    </div>
+  </div>
+</div>`;
+
+/* ===== NETHER PORTALS ===== */
+const portalsW=document.getElementById('portalsW');
+const portalGrid=[[0,1,1,0],[2,3,3,2],[2,3,3,2],[2,3,3,2],[2,3,3,2],[0,1,1,0]];
+// 0=air,1=obsidian,2=obsidian,3=purple
+function makePortal(leftPct,btm,scale){
+  const wrap=document.createElement('div');
+  wrap.className='portal-wrap';
+  wrap.style.cssText=`left:${leftPct}%;bottom:${btm}px;position:absolute;--dl:${Math.random()*2}s`;
+  portalGrid.forEach((r,ri)=>{
+    const rowEl=document.createElement('div');rowEl.style.display='flex';
+    r.forEach((cell,ci)=>{
+      const blk=document.createElement('div');
       const sz=16*scale;
-      px.style.cssText=`width:${sz}px;height:${sz}px;`;
-      if(cell==='O') px.classList.add('p-obsidian');
-      else if(cell==='P'){px.classList.add('p-purple');px.style.setProperty('--dl',(ri*.1+ci*.07)+'s');}
-      else px.style.background='transparent';
-      rowEl.appendChild(px);
+      blk.style.cssText=`width:${sz}px;height:${sz}px;`;
+      if(cell===0)blk.style.background='transparent';
+      else if(cell===1||cell===2){blk.classList.add('p-ob');}
+      else{blk.classList.add('p-pu');blk.style.setProperty('--dl',(ri*.08+ci*.06)+'s');}
+      rowEl.appendChild(blk);
     });
     wrap.appendChild(rowEl);
   });
   portalsW.appendChild(wrap);
 }
-makePortal(5, GROUND_H, 2);
-makePortal(82, GROUND_H, 1.5);
+makePortal(3,GROUND_H,2);
+makePortal(85,GROUND_H,1.5);
+makePortal(45,GROUND_H+80,1);
 
-/* ===== PIXEL CASTLE ===== */
-// Each row is an array of class names, each 16px wide
-// Legend: _=air, S=stone, D=dark, W=window, L=lava, P=portal_px, I=iron, door=door, B=brick, N=netherrack, G=glowstone, R=flag-red, V=flag-purple, C=cobble
-const W='c-window', S='c-stone', D='c-dark', _='c-air', L='c-lava', P='c-portal', I='c-iron', B='c-brick', N='c-netherrack', G='c-glowstone', R='c-flag-r', V='c-flag-p', C='c-cobble';
+/* ===== END CRYSTALS ===== */
+const crystalsW=document.getElementById('crystalsW');
+const ecMap=[[0,1,1,0],[1,1,1,1],[1,1,1,1],[0,1,1,0]];
+function makeEndCrystal(leftPct, topPct, dl){
+  const wrap=document.createElement('div');
+  wrap.className='end-crystal';
+  wrap.style.cssText=`left:${leftPct}%;top:${topPct}%;position:absolute;--dl:${dl}s`;
+  ecMap.forEach(r=>{
+    const rowEl=document.createElement('div');rowEl.className='ec-row';
+    r.forEach(cell=>{
+      const blk=document.createElement('div');
+      blk.className=cell?'ec-p':'ec-e';
+      rowEl.appendChild(blk);
+    });
+    wrap.appendChild(rowEl);
+  });
+  // beam
+  const beam=document.createElement('div');
+  beam.className='ec-beam';
+  beam.style.cssText=`width:4px;height:40px;background:linear-gradient(180deg,#ff00ff,transparent);animation:beamPulse 1s infinite alternate;animation-delay:${dl}s;margin:0 auto`;
+  wrap.appendChild(beam);
+  crystalsW.appendChild(wrap);
+}
+makeEndCrystal(25,12,0);
+makeEndCrystal(55,8,0.5);
+makeEndCrystal(72,15,1);
+makeEndCrystal(15,20,1.5);
 
-const castleRows=[
-// flags
-[_,_,_,_,_,_,_,_,_,R,_,_,_,_,_,_,_,_,V,_,_,_,_,_,_,_,_,R,_,_],
-[_,_,_,_,_,_,_,_,_,R,_,_,_,_,_,_,_,_,V,_,_,_,_,_,_,_,_,R,_,_],
-// battlements top row - main tower
-[_,_,_,_,_,_,_,_,_,S,_,_,S,_,S,_,S,_,S,_,S,_,S,_,_,S,_,_,_,_],
-[_,_,_,_,_,_,_,_,_,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,_,S,S,_,_,_],
-// window row 1
-[_,_,_,S,_,S,_,_,_,S,W,S,S,S,_,S,_,S,_,S,_,S,S,S,_,S,W,S,_,_],
-[_,_,_,S,S,S,_,_,_,S,W,S,S,S,G,S,G,S,G,S,G,S,S,S,_,S,W,S,_,_],
-// window row 2
-[_,_,_,S,W,S,_,_,_,S,S,S,S,S,_,S,_,S,_,S,_,S,S,S,_,S,S,S,_,_],
-[_,_,_,S,W,S,_,_,_,S,S,S,S,S,_,S,W,S,W,S,_,S,S,S,_,S,S,S,_,_],
-// main body
-[_,_,_,S,S,S,_,_,_,S,S,S,S,S,_,S,W,S,W,S,_,S,S,S,_,S,S,S,_,_],
-[_,_,S,S,S,S,S,_,_,S,S,S,S,S,_,S,S,S,S,S,_,S,S,S,_,S,S,S,S,_],
-[_,_,S,S,S,S,S,_,_,S,S,S,S,S,L,S,L,S,L,S,L,S,S,S,_,S,S,S,S,_],
-// portal entrance
-[_,_,S,S,S,S,S,_,_,S,S,S,_,_,P,P,P,P,P,_,_,S,S,S,_,S,S,S,S,_],
-[_,_,S,S,S,S,S,_,_,S,S,S,_,_,P,P,P,P,P,_,_,S,S,S,_,S,S,S,S,_],
-[_,_,S,S,S,S,S,_,_,S,S,S,_,_,P,P,P,P,P,_,_,S,S,S,_,S,S,S,S,_],
-// base
-[_,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,_],
-[_,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,_],
+/* ===== LANTERNS ===== */
+const lanternsW=document.getElementById('lanternsW');
+const lnMap=[[0,1,0],[1,1,1],[1,2,1],[1,1,1],[0,1,0]]; // 1=yellow,2=red
+function makeLantern(leftPct, topPct, dl){
+  const wrap=document.createElement('div');
+  wrap.className='lantern';
+  wrap.style.cssText=`left:${leftPct}%;top:${topPct}%;position:absolute;--d:${3+dl}s;--dl:${dl}s`;
+  lnMap.forEach(r=>{
+    const rowEl=document.createElement('div');rowEl.className='ln-row';
+    r.forEach(cell=>{
+      const b=document.createElement('div');
+      b.className=cell===1?'ln-y':cell===2?'ln-r':'ln-e';
+      rowEl.appendChild(b);
+    });
+    wrap.appendChild(rowEl);
+  });
+  lanternsW.appendChild(wrap);
+}
+[15,28,42,62,75,88].forEach((l,i)=>makeLantern(l,60+i%2*5,i*.5));
+
+/* ===== FIREFLIES ===== */
+const firefliesW=document.getElementById('firefliesW');
+for(let i=0;i<20;i++){
+  const f=px('firefly');
+  const x1=Math.random()*90,y1=40+Math.random()*40,x2=x1+Math.random()*10-5,y2=y1+Math.random()*10-5;
+  f.style.cssText=`--x1:${x1}%;--y1:${y1}%;--x2:${x2}%;--y2:${y2}%;--d:${2+Math.random()*4}s;--d2:${1+Math.random()*2}s;--dl:${Math.random()*5}s;position:absolute;left:${x1}%;top:${y1}%`;
+  firefliesW.appendChild(f);
+}
+
+/* ===== SAKURA TREES ===== */
+const treesW=document.getElementById('treesW');
+
+// Sakura patterns (leaf layer grids)
+const sakuraLayers=[
+  [0,1,1,1,0],
+  [1,1,1,1,1],
+  [1,1,1,1,1],
+  [0,1,1,1,0],
+  [0,0,1,0,0],
+];
+const sakuraBig=[
+  [0,0,1,1,1,0,0],
+  [0,1,1,1,1,1,0],
+  [1,1,1,1,1,1,1],
+  [1,1,1,1,1,1,1],
+  [0,1,1,1,1,1,0],
+  [0,0,1,1,1,0,0],
 ];
 
-const castleWrap=document.getElementById('castleWrap');
-const classMap={
-  'c-air':'c-air','c-stone':'c-stone','c-dark':'c-dark','c-window':'c-window',
-  'c-lava':'c-lava','c-portal':'c-portal','c-iron':'c-iron','c-door':'c-door',
-  'c-brick':'c-brick','c-netherrack':'c-netherrack','c-glowstone':'c-glowstone',
-  'c-flag-r':'c-flag-r','c-flag-p':'c-flag-p','c-cobble':'c-cobble'
-};
-
-castleRows.forEach((row,ri)=>{
-  const rowEl=document.createElement('div');
-  rowEl.className='castle-row';
-  row.forEach((cell,ci)=>{
-    const px=document.createElement('div');
-    px.className=cell;
-    if(cell===W){px.style.setProperty('--d',(1.2+ri*.1+ci*.07)+'s');px.style.setProperty('--dl',(ri*.1+ci*.05)+'s')}
-    if(cell===L){px.style.setProperty('--dl',(ci*.1)+'s')}
-    if(cell==='c-air') px.style.background='transparent';
-    rowEl.appendChild(px);
-  });
-  castleWrap.appendChild(rowEl);
-});
-// Windows glow delay
-document.querySelectorAll('.c-window').forEach((w,i)=>w.style.animationDelay=(i*.2)+'s');
-document.querySelectorAll('.c-lava').forEach((l,i)=>l.style.animationDelay=(i*.15)+'s');
-
-/* ===== PIXEL TREES ===== */
-const treesW=document.getElementById('treesWrap');
-function makeTree(leftPct, leafColor, trunkH, leafW){
+function makeSakuraTree(leftPct, trunkH, big, colorVar, zIdx){
   const tree=document.createElement('div');
-  tree.className='tree';
-  tree.style.cssText=`left:${leftPct}%;--ground-h:${GROUND_H}px`;
-  // Leaf layers (pyramid)
-  const patterns=[
-    [0,1,0],[1,1,1],[0,1,0],
-    [0,1,1,1,0],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0],
-  ];
-  const bigPatterns=[
-    [0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[1,1,1,1,1],[0,1,1,1,0]
-  ];
-  const pat=leafW>3?bigPatterns:patterns;
-  pat.forEach(rowPat=>{
-    const rowEl=document.createElement('div');
-    rowEl.className='tree-leaves-row';
-    rowPat.forEach(cell=>{
-      const px=document.createElement('div');
-      if(cell){px.className='t-leaf';px.style.setProperty('--lc',leafColor);}
-      else {px.className='t-leaf';px.style.background='transparent';px.style.boxShadow='none';}
-      rowEl.appendChild(px);
+  tree.className='sakura-tree';
+  tree.style.cssText=`left:${leftPct}%;--ground-h:${GROUND_H}px;z-index:${zIdx||7}`;
+  const layers=big?sakuraBig:sakuraLayers;
+  layers.forEach((r,ri)=>{
+    const rowEl=document.createElement('div');rowEl.className='sk-row';
+    r.forEach((cell,ci)=>{
+      const b=document.createElement('div');
+      if(cell){
+        b.className='sk-blossom';
+        b.style.setProperty('--bc',colorVar);
+        b.style.setProperty('--d',(2+ri*.2+ci*.1)+'s');
+        b.style.setProperty('--dl',(ri*.15+ci*.1)+'s');
+      } else {
+        b.className='sk-blossom';b.style.cssText='background:transparent;box-shadow:none;animation:none';
+      }
+      rowEl.appendChild(b);
     });
     tree.appendChild(rowEl);
   });
-  // Trunk
   for(let t=0;t<trunkH;t++){
-    const rowEl=document.createElement('div');
-    rowEl.className='tree-leaves-row';
-    const px=document.createElement('div');
-    px.className='t-trunk';
-    rowEl.appendChild(px);
+    const rowEl=document.createElement('div');rowEl.className='sk-row';
+    rowEl.appendChild(Object.assign(document.createElement('div'),{className:'sk-trunk'}));
     tree.appendChild(rowEl);
   }
   treesW.appendChild(tree);
 }
 
-makeTree(3,'#2d8a00',3,3);
-makeTree(10,'#1a6000',4,5);
-makeTree(22,'#2d8a00',3,3);
-makeTree(68,'#3aaa00',4,5);
-makeTree(78,'#2d8a00',3,3);
-makeTree(90,'#1a6000',4,3);
-// Nether tree (dark red)
-makeTree(60,'#5a0000',3,3);
-makeTree(85,'#5a0000',4,5);
+// Sakura trees all over
+makeSakuraTree(1,4,false,'#ff88aa',7);
+makeSakuraTree(12,5,true,'#ffaacc',7);
+makeSakuraTree(25,4,false,'#ff77bb',7);
+makeSakuraTree(64,5,true,'#ffaacc',7);
+makeSakuraTree(73,4,false,'#ff88aa',7);
+makeSakuraTree(88,5,false,'#ffbbdd',7);
+
+// Oak trees (between sakura)
+function makeOakTree(leftPct, trunkH, leafColor, zIdx){
+  const tree=document.createElement('div');
+  tree.className='oak-tree';
+  tree.style.cssText=`left:${leftPct}%;--ground-h:${GROUND_H}px;z-index:${zIdx||5}`;
+  const layers=[[0,1,0],[1,1,1],[1,1,1],[0,1,0]];
+  layers.forEach(r=>{
+    const rowEl=document.createElement('div');rowEl.style.display='flex';
+    r.forEach(cell=>{
+      const b=document.createElement('div');
+      if(cell){b.className='t-leaf';b.style.setProperty('--lc',leafColor);}
+      else{b.className='t-leaf';b.style.cssText='background:transparent;box-shadow:none';}
+      rowEl.appendChild(b);
+    });
+    tree.appendChild(rowEl);
+  });
+  for(let t=0;t<trunkH;t++){
+    const rowEl=document.createElement('div');rowEl.style.display='flex';
+    rowEl.appendChild(Object.assign(document.createElement('div'),{className:'t-trunk'}));
+    tree.appendChild(rowEl);
+  }
+  treesW.appendChild(tree);
+}
+makeOakTree(5,3,'#2d8a00',5);
+makeOakTree(18,4,'#1a6000',5);
+makeOakTree(38,3,'#3aaa00',5);
+makeOakTree(52,4,'#2d8a00',5);
+makeOakTree(80,3,'#1a6000',5);
+makeOakTree(95,4,'#3aaa00',5);
+// Jungle trees (tall, dark green)
+makeOakTree(30,6,'#1a6e00',4);
+makeOakTree(60,7,'#0a4a00',4);
+// Dark/nether trees
+makeOakTree(47,3,'#4a0a0a',4);
+
+/* ===== BAMBOO ===== */
+const bambooW=document.getElementById('bambooW');
+function makeBamboo(leftPct, segs){
+  const bam=document.createElement('div');
+  bam.className='bamboo';
+  bam.style.cssText=`left:${leftPct}%;--ground-h:${GROUND_H}px;z-index:6`;
+  // top leaf
+  const lr=document.createElement('div');lr.style.display='flex';
+  const ll=document.createElement('div');ll.className='bm-leaf-l';lr.appendChild(ll);
+  bam.appendChild(lr);
+  const rr=document.createElement('div');rr.style.display='flex';
+  const rl=document.createElement('div');rl.className='bm-leaf-r';rl.style.marginLeft='8px';rr.appendChild(rl);
+  bam.appendChild(rr);
+  for(let s=0;s<segs;s++){
+    if(s%2===0){const nr=document.createElement('div');nr.style.display='flex';const n=document.createElement('div');n.className='bm-node';nr.appendChild(n);bam.appendChild(nr);}
+    const sr=document.createElement('div');sr.style.display='flex';const seg=document.createElement('div');seg.className='bm-seg';sr.appendChild(seg);bam.appendChild(sr);
+  }
+  bambooW.appendChild(bam);
+}
+[33,34.5,36,50,51.5,53,91,92.5].forEach((l,i)=>makeBamboo(l,4+i%3));
+
+/* ===== CASTLE ===== */
+const S='c-stone',_='c-air',W='c-window',L='c-lava',P='c-portal',G='c-glowstone',B='c-brick',N='c-netherrack',D='c-dark',V='c-purpur',R='c-flag-r',PU='c-flag-p',SK='c-flag-s';
+const castleRows=[
+  [_,_,_,_,_,_,_,_,_,R,_,_,_,_,_,_,_,_,PU,_,_,_,_,_,_,_,_,SK,_,_],
+  [_,_,_,_,_,_,_,_,_,R,_,_,_,_,_,_,_,_,PU,_,_,_,_,_,_,_,_,SK,_,_],
+  [_,_,_,_,_,_,_,_,_,S,_,S,_,S,_,S,_,S,S,S,_,S,_,S,_,_,S,_,_,_],
+  [_,_,_,_,_,_,_,_,_,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,_,S,S,_,_],
+  [_,_,_,D,_,D,_,_,_,S,W,S,S,S,_,V,_,S,V,S,_,S,S,S,_,_,S,W,_,_],
+  [_,_,_,D,D,D,_,_,_,S,W,S,S,S,G,V,G,S,V,S,G,S,S,S,_,_,S,W,_,_],
+  [_,_,_,D,W,D,_,_,_,S,S,S,S,S,_,S,_,S,_,S,_,S,S,S,_,_,S,S,_,_],
+  [_,_,_,D,W,D,_,_,_,S,S,S,S,S,_,S,W,S,W,S,_,S,S,S,_,_,S,S,_,_],
+  [_,_,_,D,D,D,_,_,_,S,S,S,S,S,_,S,W,S,W,S,_,S,S,S,_,_,S,S,_,_],
+  [_,_,D,D,D,D,D,_,_,S,S,S,S,S,_,S,S,S,S,S,_,S,S,S,_,S,S,S,S,_],
+  [_,_,D,D,D,D,D,_,_,S,S,S,S,S,L,S,L,S,L,S,L,S,S,S,_,S,S,S,S,_],
+  [_,_,D,D,D,D,D,_,_,S,S,S,_,_,P,P,P,P,P,_,_,S,S,S,_,S,S,S,S,_],
+  [_,_,D,D,D,D,D,_,_,S,S,S,_,_,P,P,P,P,P,_,_,S,S,S,_,S,S,S,S,_],
+  [_,_,D,D,D,D,D,_,_,S,S,S,_,_,P,P,P,P,P,_,_,S,S,S,_,S,S,S,S,_],
+  [_,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,_],
+  [_,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,S,_],
+];
+const castleWrap=document.getElementById('castleWrap');
+castleRows.forEach((rowData,ri)=>{
+  const rowEl=document.createElement('div');rowEl.className='castle-row';
+  rowData.forEach((cell,ci)=>{
+    const b=document.createElement('div');b.className=cell;
+    if(cell===W){b.style.setProperty('--d',(1.2+ri*.12+ci*.07)+'s');b.style.setProperty('--dl',(ri*.08+ci*.05)+'s')}
+    if(cell===L)b.style.setProperty('--dl',(ci*.1)+'s');
+    if(cell==='c-air')b.style.background='transparent';
+    rowEl.appendChild(b);
+  });
+  castleWrap.appendChild(rowEl);
+});
 
 /* ===== GROUND ===== */
 const groundW=document.getElementById('groundWrap');
-const groundLayers=[
-  {cls:'g-grass',variants:['g-grass','g-grass','g-grass','g-grass','g-grass']},
-  {cls:'g-dirt',variants:['g-dirt','g-dirt','g-dirt','g-stone']},
-  {cls:'g-dirt',variants:['g-dirt','g-stone','g-dirt','g-dirt']},
-  {cls:'g-stone',variants:['g-stone','g-stone','g-diamond','g-stone']},
-  {cls:'g-stone',variants:['g-stone','g-stone','g-stone','g-stone']},
+const gLayers=[
+  // Top = mix grass and sakura-grass and petal tiles
+  {v:['g-grass','g-grass','g-grass','g-sakura-grass','g-sakura-grass','g-sakura-petal']},
+  {v:['g-dirt','g-dirt','g-dirt','g-dirt','g-stone']},
+  {v:['g-dirt','g-stone','g-dirt','g-dirt','g-gold']},
+  {v:['g-stone','g-stone','g-diamond','g-stone','g-emerald']},
+  {v:['g-stone','g-redstone','g-stone','g-stone','g-stone']},
+  {v:['g-bedrock','g-bedrock','g-bedrock','g-bedrock','g-bedrock']},
 ];
-groundLayers.forEach(layer=>{
-  const strip=document.createElement('div');
-  strip.className='ground-strip';
+gLayers.forEach(layer=>{
+  const strip=document.createElement('div');strip.className='ground-strip';
   for(let c=0;c<COLS;c++){
-    const px=document.createElement('div');
-    const v=layer.variants;
-    px.className=v[Math.floor(Math.random()*v.length)];
-    strip.appendChild(px);
+    const b=document.createElement('div');
+    b.className=layer.v[Math.floor(Math.random()*layer.v.length)];
+    strip.appendChild(b);
   }
   groundW.appendChild(strip);
 });
 
 /* ===== MOBS ===== */
-const mobsW=document.getElementById('mobsWrap');
-// Simple pixel zombie: green skin, red eyes
-function makeZombie(dur, del){
+const mobsW=document.getElementById('mobsW');
+function makeMob(rows, dur, del, btmOffset){
   const mob=document.createElement('div');
   mob.className='mob';
-  mob.style.cssText=`--d:${dur}s;--dl:${del}s;--ground-h:${GROUND_H}px`;
-  mob.innerHTML=`
-  <div class="mob-body">
-    <div class="mob-row"><div style="width:8px;height:8px;background:#6a8a4a;box-shadow:inset -2px -2px 0 #3a5a1a,inset 2px 2px 0 #8aaa6a"></div><div style="width:8px;height:8px;background:#cc0000;animation:purpleFlicker .5s infinite alternate"></div><div style="width:8px;height:8px;background:#6a8a4a;box-shadow:inset -2px -2px 0 #3a5a1a,inset 2px 2px 0 #8aaa6a"></div></div>
-    <div class="mob-row"><div style="width:8px;height:8px;background:#4466cc"></div><div style="width:8px;height:8px;background:#4466cc"></div><div style="width:8px;height:8px;background:#4466cc"></div></div>
-    <div class="mob-row"><div style="width:8px;height:8px;background:#1144aa"></div><div style="width:8px;height:8px;background:#1144aa"></div></div>
-  </div>`;
-  mobsW.appendChild(mob);
-}
-// Creeper
-function makeCreeper(dur, del){
-  const mob=document.createElement('div');
-  mob.className='mob';
-  mob.style.cssText=`--d:${dur}s;--dl:${del}s;--ground-h:${GROUND_H}px`;
-  mob.innerHTML=`
-  <div class="mob-body">
-    <div class="mob-row"><div style="width:8px;height:8px;background:#4a7a1a;box-shadow:inset -1px -1px 0 #2a4a0a,inset 1px 1px 0 #6aaa2a"></div><div style="width:8px;height:8px;background:#000;"></div><div style="width:8px;height:8px;background:#4a7a1a;box-shadow:inset -1px -1px 0 #2a4a0a,inset 1px 1px 0 #6aaa2a"></div></div>
-    <div class="mob-row"><div style="width:8px;height:8px;background:#4a7a1a"></div><div style="width:8px;height:8px;background:#000;clip-path:polygon(0 0,100% 0,100% 50%,50% 100%,0 50%)"></div><div style="width:8px;height:8px;background:#4a7a1a"></div></div>
-    <div class="mob-row"><div style="width:8px;height:8px;background:#3a6a0a"></div><div style="width:8px;height:8px;background:#3a6a0a"></div><div style="width:8px;height:8px;background:#3a6a0a"></div></div>
-    <div class="mob-row"><div style="width:8px;height:8px;background:#3a6a0a"></div><div style="width:4px;height:8px;background:transparent"></div><div style="width:8px;height:8px;background:#3a6a0a"></div></div>
-  </div>`;
+  mob.style.cssText=`--d:${dur}s;--dl:${del}s;--ground-h:${GROUND_H+btmOffset}px`;
+  const body=document.createElement('div');body.className='mob-body';
+  rows.forEach(r=>{
+    const rowEl=document.createElement('div');rowEl.className='mob-row';
+    r.forEach(([bg,w,h])=>{
+      const b=document.createElement('div');b.className='px';
+      b.style.cssText=`width:${w||8}px;height:${h||8}px;background:${bg};`;
+      rowEl.appendChild(b);
+    });
+    body.appendChild(rowEl);
+  });
+  mob.appendChild(body);
   mobsW.appendChild(mob);
 }
 
-makeZombie(18,0);
-makeZombie(24,-8);
-makeCreeper(20,-5);
-makeCreeper(28,-12);
-makeZombie(30,-18);
+// Zombie (green skin, red eyes, blue shirt)
+const zombieRows=[
+  [['#6a8a4a',8,8],['#cc0000',8,8],['#6a8a4a',8,8]],
+  [['#6a8a4a',8,8],['#6a8a4a',8,8],['#6a8a4a',8,8]],
+  [['#4466cc',8,8],['#4466cc',8,8],['#4466cc',8,8]],
+  [['#1144aa',8,8],['#transparent',4,8],['#1144aa',8,8]],
+];
 
-/* ===== FLOATING HEARTS/DIAMONDS ===== */
-const floatW=document.getElementById('floatWrap');
-// heart pixel map: 7 wide 5 tall
+// Creeper (green, black face)
+const creeperRows=[
+  [['#4a7a1a',8,8],['#000',8,8],['#000',8,8],['#4a7a1a',8,8]],
+  [['#4a7a1a',8,8],['#000',8,8],['#000',8,8],['#4a7a1a',8,8]],
+  [['#3a6a0a',8,8],['#3a6a0a',8,8],['#3a6a0a',8,8],['#3a6a0a',8,8]],
+  [['#3a6a0a',8,8],['transparent',4,8],['transparent',4,8],['#3a6a0a',8,8]],
+];
+
+// Skeleton (white)
+const skeletonRows=[
+  [['#eee',8,8],['#eee',8,8],['#eee',8,8]],
+  [['#eee',8,8],['#555',8,8],['#eee',8,8]],
+  [['#ccc',8,8],['#ccc',8,8],['#ccc',8,8]],
+  [['#ccc',8,8],['transparent',4,8],['#ccc',8,8]],
+];
+
+for(let i=0;i<3;i++) makeMob(zombieRows,18+i*5,-(i*4),0);
+for(let i=0;i<3;i++) makeMob(creeperRows,22+i*4,-(i*5+2),0);
+for(let i=0;i<2;i++) makeMob(skeletonRows,26+i*6,-(i*7+1),0);
+
+/* ===== PIXEL ANIMALS ===== */
+const animalsW=document.getElementById('animalsW');
+function makeAnimal(rows, dur, del, btm){
+  const a=document.createElement('div');
+  a.className='animal';
+  a.style.cssText=`--d:${dur}s;--dl:${del}s;--ground-h:${GROUND_H+btm}px;--start:-80px`;
+  const body=document.createElement('div');body.style.display='flex';body.style.flexDirection='column';
+  rows.forEach(r=>{
+    const rowEl=document.createElement('div');rowEl.style.display='flex';
+    r.forEach(([bg,w,h])=>{
+      const b=document.createElement('div');
+      b.style.cssText=`width:${w}px;height:${h}px;background:${bg}`;
+      rowEl.appendChild(b);
+    });
+    body.appendChild(rowEl);
+  });
+  a.appendChild(body);
+  animalsW.appendChild(a);
+}
+
+// Sheep (white fluffy)
+const sheepRows=[
+  [['#ddd',8,8],['#eee',8,8],['#eee',8,8],['#ddd',8,8]],
+  [['#eee',8,8],['#eee',8,8],['#eee',8,8],['#eee',8,8]],
+  [['#c8a06a',8,8],['#333',4,4],['#c8a06a',8,8]],
+  [['#888',4,8],['transparent',8,8],['#888',4,8]],
+];
+
+// Cow (brown/white)
+const cowRows=[
+  [['#8B5E3C',8,8],['#8B5E3C',8,8],['#8B5E3C',8,8]],
+  [['#fff',8,8],['#8B5E3C',8,8],['#fff',8,8]],
+  [['#8B5E3C',8,8],['#8B5E3C',8,8],['#8B5E3C',8,8]],
+  [['#8B5E3C',4,8],['transparent',4,8],['#8B5E3C',4,8],['transparent',4,8],['#8B5E3C',4,8]],
+];
+
+// Fox (orange)
+const foxRows=[
+  [['#ff8800',8,8],['#fff',8,8],['#ff8800',8,8]],
+  [['#ff8800',8,8],['#ff8800',8,8],['#ff8800',8,8]],
+  [['#888',4,8],['transparent',8,8],['#888',4,8]],
+];
+
+for(let i=0;i<3;i++) makeAnimal(sheepRows,30+i*8,-(i*3),0);
+for(let i=0;i<2;i++) makeAnimal(cowRows,36+i*10,-(i*4+1),0);
+for(let i=0;i<2;i++) makeAnimal(foxRows,25+i*12,-(i*5+2),0);
+
+/* ===== FALLING SAKURA PETALS ===== */
+const petalsW=document.getElementById('petalsW');
+for(let i=0;i<60;i++){
+  const p=document.createElement('div');
+  p.className='petal';
+  p.style.cssText=`left:${Math.random()*100}%;top:-20px;--d:${3+Math.random()*5}s;--dl:${-Math.random()*8}s`;
+  const inner=document.createElement('div');
+  inner.className=Math.random()>.5?'petal-px':'petal-px2';
+  inner.style.cssText=`background:#${Math.random()>.5?'ffaacc':'ff88bb'};transform:rotate(${Math.random()*360}deg)`;
+  p.appendChild(inner);
+  petalsW.appendChild(p);
+}
+
+/* ===== PIXEL HEARTS + DIAMONDS (floating) ===== */
+const floatW=document.getElementById('floatW');
 const hMap=[[0,1,1,0,1,1,0],[1,1,1,1,1,1,1],[1,1,1,1,1,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0],[0,0,0,1,0,0,0]];
-// diamond pixel map: 5 wide 5 tall
 const dMap=[[0,0,1,0,0],[0,1,1,1,0],[1,1,1,1,1],[0,1,1,1,0],[0,0,1,0,0]];
-
-function makePixelShape(map, color, left, bottom, sz, dur, del){
+function makePixelShape(map, color, leftPct, bottomPx, sz, dur, del){
   const wrap=document.createElement('div');
   wrap.className='float-item';
-  wrap.style.cssText=`left:${left}%;bottom:${bottom}px;--d:${dur}s;--dl:${del}s`;
-  map.forEach(row=>{
-    const rowEl=document.createElement('div');
-    rowEl.style.display='flex';
-    row.forEach(cell=>{
-      const px=document.createElement('div');
-      px.style.cssText=`width:${sz}px;height:${sz}px;background:${cell?color:'transparent'}`;
-      rowEl.appendChild(px);
+  wrap.style.cssText=`left:${leftPct}%;bottom:${bottomPx}px;--d:${dur}s;--dl:${del}s;position:absolute`;
+  map.forEach(r=>{
+    const rowEl=document.createElement('div');rowEl.style.display='flex';
+    r.forEach(cell=>{
+      const b=document.createElement('div');
+      b.style.cssText=`width:${sz}px;height:${sz}px;background:${cell?color:'transparent'}`;
+      rowEl.appendChild(b);
     });
     wrap.appendChild(rowEl);
   });
   floatW.appendChild(wrap);
 }
-
-for(let i=0;i<8;i++){
-  makePixelShape(hMap,'#cc0000',5+i*12,GROUND_H+20+i*15,3,2.5+i*.4,i*.5);
-  makePixelShape(dMap,'#56d9e8',8+i*11,GROUND_H+15+i*10,3,3+i*.3,i*.4+.3);
+for(let i=0;i<10;i++){
+  makePixelShape(hMap,'#cc0000',3+i*9,GROUND_H+15+i*10,3,2.5+i*.3,i*.4);
+  makePixelShape(dMap,'#56d9e8',6+i*9,GROUND_H+10+i*8,3,3+i*.25,i*.35+.2);
+  // pink hearts for sakura
+  makePixelShape(hMap,'#ff88aa',7+i*9,GROUND_H+22+i*7,2,2+i*.2,i*.5+.3);
 }
 
-/* ===== RYOKO SIGNS ===== */
-const signsW=document.getElementById('signsWrap');
-const signTexts=['RYOKO','A + R = 4EVER','MI DIAMANTE','TE AMO RYOKO'];
-signTexts.forEach((txt,i)=>{
-  const s=document.createElement('div');
-  s.className='ryoko-sign';
-  s.style.cssText=`left:${[4,35,58,78][i]}%;top:${[38,48,42,35][i]}%;position:absolute;z-index:9`;
+/* ===== SIGNS ===== */
+const signsW=document.getElementById('signsW');
+const SIGNS=[
+  {txt:'RYOKO',l:3,t:32,pink:false},
+  {txt:'A + R = 4EVER',l:34,t:42,pink:false},
+  {txt:'MI SAKURA',l:58,t:38,pink:true},
+  {txt:'TE AMO RYOKO',l:77,t:32,pink:true},
+];
+SIGNS.forEach((s,i)=>{
+  const el=document.createElement('div');
+  el.className=s.pink?'ryoko-sign sakura-sign':'ryoko-sign';
+  el.style.cssText=`left:${s.l}%;top:${s.t}%;position:absolute;z-index:12`;
   const p=document.createElement('p');
-  p.textContent=txt;
-  p.style.animationDelay=(i*.3)+'s';
-  s.appendChild(p);
-  signsW.appendChild(s);
+  p.textContent=s.txt;
+  p.style.animationDelay=(i*.35)+'s';
+  if(s.pink){p.style.color='#ffaacc';p.style.textShadow='2px 2px 0 #aa5577';}
+  el.appendChild(p);
+  signsW.appendChild(el);
 });
 
-/* ===== ITEMS / HOTBAR ===== */
+/* ===== UI / HOTBAR ITEMS ===== */
 const ITEMS=[
   {e:'💎',n:'DIAMANTE',msg:'Ryoko, eres mas valiosa que un bloque de diamante. Cada vez que te veo, mi corazon mina mas profundo y encuentra solo belleza. Quiero construir un mundo contigo, bloque por bloque. TE AMO! 💜⛏️'},
   {e:'⛏️',n:'PICO',msg:'Este pico de diamante no sirve sin ti, Ryoko. Tu sonrisa rompe cualquier muro de obsidiana. Me encanta cuando me miras, siento que cavaste directo a mi alma. 🔥💎'},
-  {e:'🧱',n:'OBSIDIANA',msg:'Ryoko, construyamos un castillo juntos. Contigo cada bloque de obsidiana se convierte en oro. Tus manos construyen fortalezas en mi pecho. Eres mi arquitecta favorita. 💜🔥'},
-  {e:'📦',n:'COFRE',msg:'Este cofre guarda todos mis sentimientos por ti, Ryoko. Cuando lo abro, salen chispas de diamante y corazones de fuego. Eres el tesoro mas grande de cualquier dimension. A+R=FOREVER! 🎮💎'},
-  {e:'🐷',n:'PIGLIN',msg:'Ryoko, hasta los piglins del Nether se rinden cuando pasas. Tu risa es mas adictiva que el oro y tu presencia es mi bioma favorito. Quiero explorar cada rincón contigo. Te adoro mi alma. 🔥💜'},
-  {e:'⚔️',n:'ESPADA',msg:'Con esta espada de diamante lucho por ti, Ryoko. Eres mi boss favorita, la que me hace querer jugar eternamente. Cruzaria mil portales solo para verte. Mi reina del bloque. TE AMO! 💎⛏️'}
+  {e:'🌸',n:'SAKURA',msg:'Ryoko, eres como un arbol sakura en flor... cada petalo es una razon por la que te adoro. Tu belleza llena todo mi mundo de color rosado. Eres mi flor favorita en cualquier bioma. 🌸💜'},
+  {e:'📦',n:'COFRE',msg:'Este cofre del alma guarda todos mis sentimientos por ti, Ryoko. Cuando lo abro, salen chispas de diamante y corazones de fuego. Eres el tesoro mas grande de cualquier dimension. A+R=FOREVER! 🎮💎'},
+  {e:'🐷',n:'PIGLIN',msg:'Ryoko, hasta los piglins del Nether se rinden cuando pasas. Tu risa es mas adictiva que el oro y tu presencia es mi bioma favorito. Quiero explorar cada rincon contigo. Te adoro mi alma. 🔥💜'},
+  {e:'⚔️',n:'ESPADA',msg:'Con esta espada de diamante lucho por ti, Ryoko. Eres mi boss favorita, la que me hace querer jugar eternamente. Cruzaria mil portales solo para verte. Mi reina del bloque sakura. TE AMO! 💎⛏️'}
 ];
 
-const POEM=`⛏ RYOKO, MI MUNDO MINECRAFT 💎
+const POEM=`⛏ RYOKO, MI MUNDO MINECRAFT 🌸
 
-En un mundo de bloques y pixels infinitos,
+En un mundo de bloques, sakuras y pixels infinitos,
 apareciste tu, mas brillante que un bloque de netherita.
-Tus ojos son dos diamantes pulidos por el tiempo,
-tus mejillas, el color de la netherita mas preciada.
+Tus ojos son dos diamantes pulidos por los dioses,
+tus mejillas, el color de la flor sakura mas preciada.
 
 Ryoko, construiria mil castillos solo para verte,
 cavaria mil minas para encontrar tu sonrisa.
 Eres mi bioma favorito, mi semilla perfecta,
-la que hace que cada mundo sea mi paraiso.
+la que hace que cada mundo sea mi paraiso rosa.
 
-Cuando caminas, los creepers no explotan de emocion,
-los zombies se convierten en guardianes de tu nombre.
+Cuando caminas, los petados sakura te siguen,
+los conejos bailan y los zorros te saludan.
 Tus manos son como bloques de slime, suaves y adictivas,
 tus labios, el redstone que enciende mis explosiones.
 
@@ -516,7 +814,7 @@ A + R = FOREVER, grabado en cada bloque de obsidiana,
 eres mi creacion favorita, mi aventura mas humana.
 
 ⛏ TE AMO RYOKO, MI DIAMANTE ETERNO 💎
-💜 TE ADORO MI ALMA, ERES MI MINECRAFT INFINITO.`;
+🌸 TE ADORO MI ALMA, ERES MI SAKURA INFINITA. 💜`;
 
 const hotbar=document.getElementById('hotbar');
 const chatBox=document.getElementById('chatBox');
@@ -530,72 +828,59 @@ ITEMS.forEach((item,i)=>{
   slot.className='hotbar-slot';
   slot.innerHTML=`<div class="slot-emoji">${item.e}</div><div class="slot-label">${item.n}</div><div class="slot-count">${i+1}</div>`;
   slot.addEventListener('click',()=>{
-    if(slot.classList.contains('used')){
-      addChat('SISTEMA','Ya minaste este bloque...',  '#ff5555');
-      return;
-    }
+    if(slot.classList.contains('used')){addChat('SISTEMA','Ya recogiste este item...\n','#ff5555');return;}
     slot.classList.add('used');
     clicked++;
     xpFill.style.width=(clicked/6*100)+'%';
-    counterEl.textContent=`⛏ ${clicked} / 6 DIAMANTES 💎`;
-    addChat('MENSAJE',item.msg,'#ffff55');
-    showToast(`LOGRO: ${item.n} ENCONTRADO!`);
+    counterEl.textContent=`⛏ ${clicked} / 6 ITEMS 💎`;
+    addChat('MENSAJE ♥',item.msg,'#ffaacc');
+    showToast(`🏆 ${item.n} ENCONTRADO!`);
     spawnSparks();
-    if(clicked===6&&!poemShown) setTimeout(showPoem, 800);
+    if(clicked===6&&!poemShown) setTimeout(showPoem,800);
   });
   hotbar.appendChild(slot);
 });
 
-function addChat(label, msg, col){
-  const d=document.createElement('div');
-  d.className='chat-line';
+function addChat(label,msg,col){
+  const d=document.createElement('div');d.className='chat-line';
   d.innerHTML=`<span style="color:${col}">[${label}]</span> ${msg}`;
-  chatBox.appendChild(d);
-  chatBox.scrollTop=chatBox.scrollHeight;
+  chatBox.appendChild(d);chatBox.scrollTop=chatBox.scrollHeight;
 }
-
 function showPoem(){
   poemShown=true;
-  counterEl.textContent='⛏ MUNDO COMPLETADO! 💎💜';
-  counterEl.style.color='#55ffff';
-  const d=document.createElement('div');
-  d.className='chat-poem';
-  d.textContent=POEM;
-  chatBox.appendChild(d);
-  chatBox.scrollTop=chatBox.scrollHeight;
-  showToast('¡LOGRO: MUNDOMAESTRO RYOKO!');
-  for(let i=0;i<40;i++) setTimeout(spawnSparks,i*80);
+  counterEl.textContent='⛏ MUNDO COMPLETO! 💎🌸';
+  counterEl.style.color='#ffaacc';
+  const d=document.createElement('div');d.className='chat-poem';d.textContent=POEM;
+  chatBox.appendChild(d);chatBox.scrollTop=chatBox.scrollHeight;
+  showToast('🌸 LOGRO: MUNDO SAKURA COMPLETO!');
+  for(let i=0;i<50;i++) setTimeout(spawnSparks,i*60);
 }
-
 function showToast(msg){
   toast.style.display='block';
-  toast.querySelector('p').textContent='🏆 '+msg;
+  toast.querySelector('p').textContent=msg;
   clearTimeout(toast._t);
   toast._t=setTimeout(()=>toast.style.display='none',3000);
 }
-
 function spawnSparks(){
-  const emojis=['💎','🔥','💜','⛏️','❤️','✨','⭐'];
+  const symbols=['💎','🌸','💜','⛏️','❤️','✨','⭐','🌺','💫'];
   const s=document.createElement('div');
-  s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-  s.style.cssText=`position:fixed;left:${Math.random()*100}%;bottom:0;font-size:${18+Math.random()*18}px;pointer-events:none;z-index:999;transition:all 2s ease-out;opacity:.9`;
+  s.textContent=symbols[Math.floor(Math.random()*symbols.length)];
+  s.style.cssText=`position:fixed;left:${Math.random()*100}%;bottom:0;font-size:${16+Math.random()*18}px;pointer-events:none;z-index:999;transition:all 2s ease-out;opacity:.9`;
   document.body.appendChild(s);
-  requestAnimationFrame(()=>{
-    s.style.transform=`translateY(-${VH*.7+Math.random()*100}px) rotate(${Math.random()*40-20}deg)`;
-    s.style.opacity='0';
-  });
+  requestAnimationFrame(()=>{s.style.transform=`translateY(-${VH*.75+Math.random()*80}px) rotate(${Math.random()*40-20}deg)`;s.style.opacity='0';});
   setTimeout(()=>s.remove(),2100);
 }
 
-// Click on world = place block effect
+// Place block on click
 document.getElementById('world').addEventListener('click',e=>{
-  if(e.target.id==='world'||e.target.id==='sky'||e.target.id==='groundWrap'){
-    const block=document.createElement('div');
-    block.className='g-dirt';
-    block.style.cssText=`position:fixed;left:${e.clientX-8}px;top:${e.clientY-8}px;z-index:15;pointer-events:none;transition:all .4s;opacity:1`;
-    document.body.appendChild(block);
-    setTimeout(()=>{block.style.opacity='0';block.style.transform='translateY(-20px)';},50);
-    setTimeout(()=>block.remove(),500);
+  const tgt=e.target;
+  if(tgt.id==='world'||tgt.id==='sky'||tgt.classList.contains('g-grass')||tgt.classList.contains('g-sakura-grass')){
+    const b=document.createElement('div');
+    b.className='g-dirt';
+    b.style.cssText=`position:fixed;left:${e.clientX-8}px;top:${e.clientY-8}px;z-index:50;pointer-events:none;transition:all .45s;opacity:1`;
+    document.body.appendChild(b);
+    setTimeout(()=>{b.style.opacity='0';b.style.transform='translateY(-24px)';},40);
+    setTimeout(()=>b.remove(),500);
   }
 });
 
